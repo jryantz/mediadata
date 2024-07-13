@@ -57,7 +57,7 @@ class BaseCommand:
         self.add_arguments(parser)
         return parser
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: ArgumentParser):
         """
         Command arguments. Subclasses can implement this method.
 
