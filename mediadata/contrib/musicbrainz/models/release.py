@@ -1,5 +1,6 @@
-from mediadata.contrib.musicbrainz.models.chapter import Chapter
+from mediadata.core.models.chapter import Chapter
 from mediadata.contrib.musicbrainz.models.media import Media
+
 
 class Release:
     id: str
