@@ -1,5 +1,5 @@
-from mediadata.core.models.chapter import Chapter
 from mediadata.contrib.musicbrainz.models.media import Media
+from mediadata.core.models.chapter import Chapter
 
 
 class Release:
@@ -17,12 +17,16 @@ class Release:
         self.media.sort(key=lambda x: x.position)
 
     def get_chapters(self):
-        data: list[Chapter] = []
+        chapters: list[Chapter] = []
 
         for position in self.media:
             for track in position.tracks:
-                start = track.length + data[-1].position
-                chapter = Chapter(track.title, start)
-                data.append(chapter)
+                previous_chapter = chapters[-1] if len(chapters) > 0 else None
+                chapter = Chapter(
+                    track.title,
+                    previous_chapter.end_position if previous_chapter else 0,
+                    track.length,
+                )
+                chapters.append(chapter)
 
-        return data
+        return chapters
