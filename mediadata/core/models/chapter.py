@@ -1,17 +1,27 @@
 class Chapter:
     title: str
-    position: int
+    _position: int
+    _length: int
 
-    def __init__(self, title, position):
+    def __init__(self, title, position, length):
         self.title = title
-        self.position = position
+        self._position = position
+        self._length = length
 
     def __str__(self):
         return f"{self.timecode} - {self.title}"
 
     @property
+    def start_position(self):
+        return self._position
+
+    @property
+    def end_position(self):
+        return self._position + self._length
+
+    @property
     def timecode(self):
-        position = int(self.position)
+        position = int(self.start_position)
 
         seconds = (position / 1000) % 60
 
