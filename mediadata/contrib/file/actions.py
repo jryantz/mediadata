@@ -1,6 +1,29 @@
-import re
+from mutagen.mp3 import MP3
 
-from mediadata.utils.ffmpeg.actions import detect_silence
+from mediadata.core.models.chapter import Chapter
+from mediadata.utils.ffmpeg.actions import (
+    detect_silence,
+    extract_chapter_positions_from_response,
+)
+
+
+def get_chapters_from_start_positions(chapter_start_positions, file_length):
+    chapters: list[Chapter] = []
+
+    for i, start in enumerate(chapter_start_positions):
+        if i < len(chapter_start_positions) - 1:
+            length = chapter_start_positions[i + 1] - start
+        else:
+            length = file_length - start
+
+        chapter = Chapter(
+            "",
+            start,
+            length,
+        )
+        chapters.append(chapter)
+
+    return chapters
 
 
 def get_chapters_from_silence(file, silence_duration=4.0):
@@ -8,20 +31,10 @@ def get_chapters_from_silence(file, silence_duration=4.0):
 
     data = detect_silence(file, silence_duration)
 
-    # Decode command response and split by line
-    lines = data.decode("utf-8").split("\n")
+    chapter_start_positions = extract_chapter_positions_from_response(data)
 
-    # Filter the output lines
-    matches = [re.search(r"silence_(start|end): [0-9.]+", x) for x in lines]
+    chapters = get_chapters_from_start_positions(
+        chapter_start_positions, MP3(file).info.length
+    )
 
-    # Filter out the None values and extract matches
-    matches = [x.group() for x in matches if x]
-
-    # Extract the values
-    values = [int(float(x.split(":")[1].strip()) * 1000) for x in matches if "end" in x]
-
-    # Add the start value
-    if values[0] != 0:
-        values = [0] + values
-
-    return values
+    return chapters
