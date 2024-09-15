@@ -1,5 +1,6 @@
 from mediadata.contrib.musicbrainz.models.track import Track
 
+
 class Media:
     title: str
     position: int

@@ -6,11 +6,13 @@ class CoreLogger(object):
     App logger for registering issues at runtime.
     """
 
-    def __new__(self):
-        if not hasattr(self, "instance"):
-            self.instance = super(CoreLogger, self).__new__(self)
-            self.initialized = False
-        return self.instance
+    instance = None
+
+    def __new__(cls):
+        if not hasattr(cls, "instance"):
+            cls.instance = super(CoreLogger, cls).__new__(cls)
+            cls.initialized = False
+        return cls.instance
 
     def __init__(self, debug=False):
         # Check if the logger already exists.
