@@ -1,15 +1,20 @@
 import re
 import subprocess
+from pathlib import Path
+
+from mediadata.utils.log import CoreLogger
 
 
-def detect_silence(file, silence_duration=4.0):
+def detect_silence(file_path: Path, silence_duration=4.0):
     """Search for silence in the file with a minimum duration"""
+
+    CoreLogger().logger.info(f"Starting FFmpeg silence detection")
 
     process = subprocess.Popen(
         [
             "ffmpeg",
             "-i",
-            file,
+            file_path,
             "-af",
             f"silencedetect=d={silence_duration}",
             "-f",

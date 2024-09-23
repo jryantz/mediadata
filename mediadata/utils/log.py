@@ -9,7 +9,7 @@ class CoreLogger(object):
     instance = None
 
     def __new__(cls):
-        if not hasattr(cls, "instance"):
+        if not hasattr(cls, "instance") or cls.instance is None:
             cls.instance = super(CoreLogger, cls).__new__(cls)
             cls.initialized = False
         return cls.instance
@@ -24,14 +24,14 @@ class CoreLogger(object):
         if debug:
             self.logger.setLevel(logging.DEBUG)
         else:
-            self.logger.setLevel(logging.WARNING)
+            self.logger.setLevel(logging.INFO)
 
         # Create console handler and set level to debug.
         ch = logging.StreamHandler()
         if debug:
             ch.setLevel(logging.DEBUG)
         else:
-            ch.setLevel(logging.WARNING)
+            ch.setLevel(logging.INFO)
 
         # Create formatter.
         formatter = logging.Formatter(

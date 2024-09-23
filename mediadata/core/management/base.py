@@ -1,9 +1,9 @@
-import argparse
 import os
 import sys
 from argparse import ArgumentParser, HelpFormatter
 
 import mediadata
+from mediadata.utils.log import CoreLogger
 
 
 class CommandError(Exception):
@@ -13,7 +13,7 @@ class CommandError(Exception):
 
     def __init__(self, *args, returncode=1, **kwargs):
         self.returncode = returncode
-        super().__init__(*args, **kwargs)
+        super().__init__(*args)
 
 
 class BaseCommand:
@@ -27,12 +27,16 @@ class BaseCommand:
         self.stdout = stdout or sys.stdout
         self.stderr = stderr or sys.stderr
 
-    def get_version(self):
+    @staticmethod
+    def get_version():
         """
         Return the mediadata version for all commands.
         """
 
         return mediadata.get_version()
+
+    def set_verbose(self):
+        pass
 
     def create_parser(
         self, prog_name: str, subcommand: str, **kwargs
@@ -46,6 +50,12 @@ class BaseCommand:
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
             **kwargs,
+        )
+        parser.add_argument(
+            "-v",
+            "--verbose",
+            action="store_true",
+            help="show verbose output",
         )
         parser.add_argument(
             "-V",
@@ -94,6 +104,10 @@ class BaseCommand:
         arguments = parser.parse_args(argv[2:])
         options = vars(arguments)
         args = options.pop("args", ())
+
+        if options.get("verbose"):
+            CoreLogger(True)
+
         try:
             self.handle(*args, **options)
         except CommandError as e:
