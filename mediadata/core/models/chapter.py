@@ -1,4 +1,13 @@
+"""
+Chapter model
+"""
+
+
 class Chapter:
+    """
+    Chapter model
+    """
+
     title: str
     _position: int
     _length: int
@@ -22,6 +31,10 @@ class Chapter:
 
     @staticmethod
     def chapters_from_file(file_path, length):
+        """
+        Creates a list of Chapters from a file
+        """
+
         with open(file_path, "r", encoding="utf-8") as file:
             lines = file.read().splitlines()
 
@@ -41,14 +54,26 @@ class Chapter:
 
     @property
     def start_position(self):
+        """
+        Chapter start position
+        """
+
         return self._position
 
     @property
     def end_position(self):
+        """
+        Chapter end position
+        """
+
         return self._position + self._length
 
     @property
     def timecode(self):
+        """
+        Chapter timecode
+        """
+
         position = int(self.start_position)
 
         seconds = (position / 1000) % 60
@@ -62,6 +87,10 @@ class Chapter:
 
 
 def convert_timecode_to_timestamp(timecode):
+    """
+    Converts timecode to timestamp
+    """
+
     hours, minutes, seconds = timecode.split(":")
 
     hours_to_ms = int(hours) * 1000 * 60 * 60

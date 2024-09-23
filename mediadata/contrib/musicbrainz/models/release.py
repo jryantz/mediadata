@@ -1,8 +1,16 @@
+"""
+Release model
+"""
+
 from mediadata.contrib.musicbrainz.models.media import Media
 from mediadata.core.models.chapter import Chapter
 
 
 class Release:
+    """
+    Release model
+    """
+
     id: str
     title: str
 
@@ -17,6 +25,10 @@ class Release:
         self.media.sort(key=lambda x: x.position)
 
     def get_chapters(self):
+        """
+        Retrieve all chapter objects
+        """
+
         chapters: list[Chapter] = []
 
         for position in self.media:

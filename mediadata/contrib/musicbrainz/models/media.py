@@ -1,7 +1,15 @@
+"""
+Media model
+"""
+
 from mediadata.contrib.musicbrainz.models.track import Track
 
 
 class Media:
+    """
+    Media model
+    """
+
     title: str
     position: int
     track_offset: int

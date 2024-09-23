@@ -1,7 +1,11 @@
+"""
+Default app logger module
+"""
+
 import logging
 
 
-class CoreLogger(object):
+class CoreLogger:
     """
     App logger for registering issues at runtime.
     """

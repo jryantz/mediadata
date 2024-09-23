@@ -1,23 +1,36 @@
+"""
+MusicBrainz actions
+"""
+
 import requests
 
 from mediadata.contrib.musicbrainz.models.release import Release
 from mediadata.contrib.musicbrainz.validators import validate_mbid
 
 
-def _get_url(id: str):
-    if validate_mbid(id):
-        return f"https://musicbrainz.org/ws/2/release/{id}"
+def _get_url(key: str):
+    """
+    Returns a valid MusicBrainz URL for a given MusicBrainz ID
+    """
+
+    if validate_mbid(key):
+        return f"https://musicbrainz.org/ws/2/release/{key}"
 
     return None
 
 
-def get_data(id: str):
+def get_data(key: str):
+    """
+    Retrieves data for a given MusicBrainz ID
+    """
+
     response = requests.get(
-        url=_get_url(id),
+        url=_get_url(key),
         params={
             "fmt": "json",
             "inc": "aliases+artist-credits+labels+discids+recordings",
         },
+        timeout=10,
     )
 
     if not response.ok:
@@ -27,7 +40,11 @@ def get_data(id: str):
     return Release(**data)
 
 
-def get_chapters(id: str):
-    release = get_data(id)
+def get_chapters(key: str):
+    """
+    Retrieves chapter data for a given MusicBrainz ID
+    """
+
+    release = get_data(key)
     chapters = release.get_chapters()
     return chapters

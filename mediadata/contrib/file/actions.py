@@ -1,3 +1,7 @@
+"""
+File actions
+"""
+
 from pathlib import Path
 
 from mediadata.contrib.file.models.file import File
@@ -9,6 +13,10 @@ from mediadata.utils.ffmpeg.actions import (
 
 
 def get_chapters_from_start_positions(chapter_start_positions, file_length):
+    """
+    Creates Chapter objects from start positions
+    """
+
     chapters: list[Chapter] = []
 
     for i, start in enumerate(chapter_start_positions):
@@ -28,7 +36,9 @@ def get_chapters_from_start_positions(chapter_start_positions, file_length):
 
 
 def get_chapters_from_silence(file_path: Path, silence_duration=4.0):
-    """Identify chapter markers by locating silence in the file"""
+    """
+    Identify chapter markers by locating silence in the file
+    """
 
     data = detect_silence(file_path, silence_duration)
 

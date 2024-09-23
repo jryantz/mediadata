@@ -1,3 +1,7 @@
+"""
+FFmpeg actions
+"""
+
 import re
 import subprocess
 from pathlib import Path
@@ -8,7 +12,7 @@ from mediadata.utils.log import CoreLogger
 def detect_silence(file_path: Path, silence_duration=4.0):
     """Search for silence in the file with a minimum duration"""
 
-    CoreLogger().logger.info(f"Starting FFmpeg silence detection")
+    CoreLogger().logger.info("Starting FFmpeg silence detection")
 
     process = subprocess.Popen(
         [
@@ -27,12 +31,16 @@ def detect_silence(file_path: Path, silence_duration=4.0):
     res, err = process.communicate()
 
     if process.returncode != 0:
-        raise Exception(err)
+        raise ChildProcessError(err)
 
     return res
 
 
 def extract_chapter_positions_from_response(data):
+    """
+    Extract chapter positions from FFmpeg silencedetect
+    """
+
     # Decode command response and split by line
     lines = data.decode("utf-8").split("\n")
 

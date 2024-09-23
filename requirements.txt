@@ -1,3 +1,4 @@
 black
 mutagen
+pylint
 requests

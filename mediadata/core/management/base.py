@@ -1,3 +1,7 @@
+"""
+Base classes for all management commands
+"""
+
 import os
 import sys
 from argparse import ArgumentParser, HelpFormatter
@@ -11,7 +15,7 @@ class CommandError(Exception):
     Exception class for a problem while executing a command.
     """
 
-    def __init__(self, *args, returncode=1, **kwargs):
+    def __init__(self, *args, returncode=1):
         self.returncode = returncode
         super().__init__(*args)
 
@@ -35,9 +39,6 @@ class BaseCommand:
 
         return mediadata.get_version()
 
-    def set_verbose(self):
-        pass
-
     def create_parser(
         self, prog_name: str, subcommand: str, **kwargs
     ) -> ArgumentParser:
@@ -47,7 +48,7 @@ class BaseCommand:
 
         kwargs.setdefault("formatter_class", HelpFormatter)
         parser = ArgumentParser(
-            prog="%s %s" % (os.path.basename(prog_name), subcommand),
+            prog=f"{os.path.basename(prog_name)} {subcommand}",
             description=self.help or None,
             **kwargs,
         )
@@ -106,7 +107,7 @@ class BaseCommand:
         args = options.pop("args", ())
 
         if options.get("verbose"):
-            CoreLogger(True)
+            CoreLogger(debug=True).logger.info("Setting logging level to verbose")
 
         try:
             self.handle(*args, **options)
@@ -114,7 +115,7 @@ class BaseCommand:
             if arguments.traceback:
                 raise
 
-            self.stderr.write("%s: %s" % (e.__class__.__name__, e))
+            self.stderr.write(f"{e.__class__.__name__}: {e}")
             sys.exit(e.returncode)
 
     def handle(self, *args, **options):

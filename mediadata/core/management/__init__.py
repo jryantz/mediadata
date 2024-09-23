@@ -1,3 +1,7 @@
+"""
+Application management module
+"""
+
 import os
 import pkgutil
 import sys
@@ -13,6 +17,11 @@ from mediadata.core.management.base import (
 
 
 def find_commands(management_dir: str) -> list[str]:
+    """
+    Traverses the management commands directory and loads
+    available commands
+    """
+
     command_dir = os.path.join(management_dir, "commands")
     return [
         name
@@ -22,12 +31,20 @@ def find_commands(management_dir: str) -> list[str]:
 
 
 def load_command_class(name):
-    module = import_module("mediadata.core.management.commands.%s" % name)
+    """
+    Loads a command class and returns it
+    """
+
+    module = import_module(f"mediadata.core.management.commands.{name}")
     return module.Command()
 
 
 def get_commands() -> list[str]:
-    return [name for name in find_commands(__path__[0])]
+    """
+    Returns a list of available commands
+    """
+
+    return list(find_commands(__path__[0]))
 
 
 class ManagementUtility:
@@ -50,10 +67,9 @@ class ManagementUtility:
             usage = sorted(get_commands())
         else:
             usage = [
-                "usage: %s <subcommand>" % self.prog_name,
+                f"usage: {self.prog_name} <subcommand>",
                 "",
-                "Type '%s help <subcommand>' for help with a specific subcommand."
-                % self.prog_name,
+                f"Type '{self.prog_name} help <subcommand>' for help with a specific subcommand.",
                 "",
                 "subcommands:",
             ]
@@ -73,10 +89,10 @@ class ManagementUtility:
             app_name = "mediadata.core"
         else:
             possible_matches = get_close_matches(subcommand, commands)
-            sys.stderr.write("Unknown command: %r" % subcommand)
+            sys.stderr.write(f"Unknown command: {subcommand}")
             if possible_matches:
-                sys.stderr.write(". Did you mean %s?" % possible_matches[0])
-            sys.stderr.write("\nType '%s help' for usage.\n" % self.prog_name)
+                sys.stderr.write(f". Did you mean {possible_matches[0]}?")
+            sys.stderr.write(f"\nType '{self.prog_name} help' for usage.\n")
             sys.exit(1)
 
         if isinstance(app_name, BaseCommand):

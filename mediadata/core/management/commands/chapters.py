@@ -1,3 +1,7 @@
+"""
+Chapters management command
+"""
+
 from pathlib import Path
 
 from mediadata.contrib.file.actions import (
@@ -14,6 +18,10 @@ from mediadata.utils.log import CoreLogger
 
 
 class Command(BaseCommand):
+    """
+    Chapters management command
+    """
+
     help = "Generate a chapters file from a selected source"
 
     def add_arguments(self, parser):
@@ -68,7 +76,7 @@ def _get_file(options: dict):
     input_value = options["input"][0]
     input_path = Path(input_value)
 
-    CoreLogger().logger.info(f"Retrieving file: {options['input'][0]}")
+    CoreLogger().logger.info("Retrieving file: %s", options["input"][0])
 
     if not input_path.exists():
         raise ValueError(f"File not found: {input_value}")
@@ -100,14 +108,14 @@ def _get_action(file_path: Path, options: dict):
 
 
 def _generate_file(file_path: Path, chapters: list[Chapter]):
-    CoreLogger().logger.info(f"Generating {len(chapters)} chapters")
+    CoreLogger().logger.info("Generating %s chapters", len(chapters))
 
     output_file = file_path.parent / f"{file_path.stem}.txt"
     with output_file.open("w", encoding="utf-8") as f:
         for chapter in chapters:
             f.write(f"{str(chapter)}\n")
 
-    CoreLogger().logger.info(f"Wrote {len(chapters)} chapters to file")
+    CoreLogger().logger.info("Wrote %s chapters to file", len(chapters))
 
 
 def _merge(file_path: Path):

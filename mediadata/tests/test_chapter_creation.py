@@ -1,3 +1,7 @@
+"""
+Chapter creation tests
+"""
+
 import tempfile
 import unittest
 
@@ -5,7 +9,15 @@ from mediadata.core.models import chapter
 
 
 class TestChapterCreation(unittest.TestCase):
+    """
+    Chapter creation tests
+    """
+
     def test_chapters_from_file(self):
+        """
+        Chapter creation from file test
+        """
+
         file_content_list = [
             "00:00:00.000 - Chapter 1",
             "00:01:00.000 - Chapter 2",

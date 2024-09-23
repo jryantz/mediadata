@@ -1,3 +1,7 @@
+"""
+File model
+"""
+
 from pathlib import Path
 
 from mutagen.mp3 import MP3
@@ -7,6 +11,10 @@ from mediadata.utils.log import CoreLogger
 
 
 class File:
+    """
+    File model
+    """
+
     file: MP3 | MP4
     path: Path
 
@@ -27,7 +35,7 @@ class File:
                 raise TypeError(f"File type {file_type} not supported")
 
         CoreLogger().logger.info(
-            f"Parsing file as {file_type.replace('.', '').upper()}"
+            "Parsing file as %s", file_type.replace(".", "").upper()
         )
 
         return file_obj

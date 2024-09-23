@@ -1,4 +1,13 @@
+"""
+Track model
+"""
+
+
 class Track:
+    """
+    Track model
+    """
+
     id: str
     title: str
     position: int
