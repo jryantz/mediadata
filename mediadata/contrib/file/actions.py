@@ -1,7 +1,3 @@
-"""
-File actions
-"""
-
 from pathlib import Path
 
 from mediadata.contrib.file.models.file import File
@@ -46,8 +42,10 @@ def get_chapters_from_silence(file_path: Path, silence_duration=4.0):
 
     file = File(file_path).file
 
+    file_length_ms = int(file.info.length * 1000)
+
     chapters = get_chapters_from_start_positions(
-        chapter_start_positions, file.info.length
+        chapter_start_positions, file_length_ms
     )
 
     return chapters

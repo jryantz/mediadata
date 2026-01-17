@@ -46,9 +46,15 @@ class Chapter:
             position = convert_timecode_to_timestamp(content[0])
 
             if i == 0:
-                chapters.append(Chapter(title, position, length))
+                # Last chapter: length goes to end of file
+                chapters.append(Chapter(title, position, length - position))
             else:
-                chapters.append(Chapter(title, position, reversed_lines[i - 1]))
+                # Calculate length as difference to next chapter
+                next_line = reversed_lines[i - 1]
+                next_content = next_line.split(" - ")
+                next_position = convert_timecode_to_timestamp(next_content[0])
+                chapter_length = next_position - position
+                chapters.append(Chapter(title, position, chapter_length))
 
         return list(reversed(chapters))
 

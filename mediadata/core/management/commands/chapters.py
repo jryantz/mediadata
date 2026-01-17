@@ -4,14 +4,14 @@ Chapters management command
 
 from pathlib import Path
 
-from mediadata.contrib.file.actions import (
-    get_chapters_from_silence,
-)
+from mediadata.contrib.chapters.operations import merge_chapters_to_file
+from mediadata.contrib.file.actions import get_chapters_from_silence
 from mediadata.contrib.file.models.file import File
 from mediadata.contrib.musicbrainz.actions import (
     get_chapters as get_chapters_from_musicbrainz,
 )
 from mediadata.contrib.musicbrainz.validators import validate_mbid
+from mediadata.contrib.whisper.actions import get_chapters_from_whisper
 from mediadata.core.management.base import BaseCommand
 from mediadata.core.models.chapter import Chapter
 from mediadata.utils.log import CoreLogger
@@ -51,8 +51,9 @@ class Command(BaseCommand):
             action="store",
             type=str,
             choices=[
-                "musicbrainz",
                 "detect-silence",
+                "musicbrainz",
+                "whisper",
             ],
             help="",
         )
@@ -98,6 +99,8 @@ def _get_action(file_path: Path, options: dict):
                     musicbrainz_id = options.get("musicbrainz_id")
                     validate_mbid(musicbrainz_id)
                     chapters = get_chapters_from_musicbrainz(musicbrainz_id)
+                case "whisper":
+                    chapters = get_chapters_from_whisper(file_path)
                 case _:
                     raise ValueError(f"Source {source} not supported")
             return _generate_file, {"file_path": file_path, "chapters": chapters}
@@ -119,13 +122,34 @@ def _generate_file(file_path: Path, chapters: list[Chapter]):
 
 
 def _merge(file_path: Path):
+    """
+    Merge chapters from a text file into an audio file.
+
+    Reads chapters from a .txt file and writes them to the audio file metadata.
+    Supports MP3 (via ID3v2 CHAP frames) and MP4/M4B (via chapter atoms).
+    """
+
+    logger = CoreLogger().logger
     audio_file_path = file_path
     chapters_file_path = file_path.parent / f"{file_path.stem}.txt"
 
+    if not chapters_file_path.exists():
+        raise ValueError(
+            f"Chapters file not found: {chapters_file_path}. "
+            f"Generate it first with --action generate-file"
+        )
+
+    logger.info("Reading chapters from: %s", chapters_file_path)
+
     audio_file = File(audio_file_path).file
-    if type(audio_file).__name__ == "MP4":
-        pass
+    file_type = type(audio_file).__name__
 
-    Chapter.chapters_from_file(chapters_file_path, audio_file.info.length)
+    file_length_ms = int(audio_file.info.length * 1000)
+    chapters = Chapter.chapters_from_file(chapters_file_path, file_length_ms)
+    logger.info("Loaded %d chapters from file", len(chapters))
 
-    # TODO: Merge the chapters onto the file
+    merge_chapters_to_file(audio_file_path, chapters, file_type)
+
+    logger.info(
+        "Successfully merged %d chapters into %s", len(chapters), file_path.name
+    )
